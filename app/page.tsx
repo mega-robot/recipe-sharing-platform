@@ -1,8 +1,21 @@
 import Link from "next/link";
+import { UserMenu } from "./components/user-menu";
+import { createClient } from "@/lib/supabase/server";
+import { redirect } from "next/navigation";
 
-export default function Home() {
+export default async function Home() {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  // Redirect logged-in users to dashboard
+  if (user) {
+    redirect('/dashboard');
+  }
+
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50 flex flex-col">
       {/* Header */}
       <header className="bg-white border-b border-gray-200 sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -25,160 +38,47 @@ export default function Home() {
               </Link>
             </nav>
 
-            {/* Auth Buttons */}
-            <div className="flex items-center space-x-4">
-              <Link
-                href="/login"
-                className="text-gray-700 hover:text-orange-500 transition-colors px-4 py-2"
-              >
-                Log In
-              </Link>
-              <Link
-                href="/signup"
-                className="bg-orange-500 text-white px-4 py-2 rounded-lg hover:bg-orange-600 transition-colors"
-              >
-                Sign Up
-              </Link>
-            </div>
+            {/* Auth Buttons / User Menu */}
+            <UserMenu />
           </div>
         </div>
       </header>
 
-      {/* Hero Section */}
-      <section className="bg-gradient-to-br from-orange-50 to-orange-100 py-20">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center max-w-3xl mx-auto">
-            <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-gray-900 mb-6">
-              Discover & Share Amazing Recipes
-            </h1>
-            <p className="text-lg md:text-xl text-gray-600 mb-8">
+      {/* Main Content */}
+      <main className="flex-grow flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
+        <div className="max-w-md w-full space-y-8">
+          <div className="text-center">
+            <h2 className="text-3xl font-extrabold text-gray-900">
+              Welcome to RecipeShare
+            </h2>
+            <p className="mt-2 text-sm text-gray-600">
               Join our community of food lovers. Share your favorite recipes and discover new culinary delights.
             </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Link
-                href="/recipes"
-                className="bg-orange-500 text-white px-8 py-3 rounded-lg text-lg font-semibold hover:bg-orange-600 transition-colors"
-              >
-                Browse Recipes
-              </Link>
-              <Link
-                href="/signup"
-                className="bg-white text-orange-500 px-8 py-3 rounded-lg text-lg font-semibold border-2 border-orange-500 hover:bg-orange-50 transition-colors"
-              >
-                Share Your Recipe
-              </Link>
-            </div>
           </div>
-        </div>
-      </section>
-
-      {/* Search Bar */}
-      <section className="py-8 bg-white border-b border-gray-200">
-        <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="relative">
-            <input
-              type="text"
-              placeholder="Search for recipes, ingredients, or categories..."
-              className="w-full px-6 py-4 pl-12 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent text-lg"
-            />
-            <svg
-              className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
-              />
-            </svg>
-          </div>
-        </div>
-      </section>
-
-      {/* Featured Recipes */}
-      <section className="py-16">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between mb-8">
-            <h2 className="text-3xl font-bold text-gray-900">Popular Recipes</h2>
+          <div className="space-y-4">
             <Link
-              href="/recipes"
-              className="text-orange-500 hover:text-orange-600 font-semibold"
+              href="/signup"
+              className="w-full flex justify-center py-3 px-4 border border-transparent rounded-lg shadow-sm text-base font-medium text-white bg-orange-600 hover:bg-orange-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-orange-500 transition-colors"
             >
-              View All →
+              Start Creating
+            </Link>
+            <div className="relative">
+              <div className="absolute inset-0 flex items-center">
+                <div className="w-full border-t border-gray-300" />
+              </div>
+              <div className="relative flex justify-center text-sm">
+                <span className="px-2 bg-gray-50 text-gray-500">Or</span>
+              </div>
+            </div>
+            <Link
+              href="/login"
+              className="w-full flex justify-center py-3 px-4 border border-gray-300 rounded-lg shadow-sm text-base font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-orange-500 transition-colors"
+            >
+              Sign In
             </Link>
           </div>
-
-          {/* Recipe Grid */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-            {[1, 2, 3, 4, 5, 6, 7, 8].map((item) => (
-              <Link
-                key={item}
-                href={`/recipes/${item}`}
-                className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-xl transition-shadow"
-              >
-                <div className="aspect-video bg-gradient-to-br from-orange-200 to-orange-300 flex items-center justify-center">
-                  <svg
-                    className="w-16 h-16 text-orange-400"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"
-                    />
-                  </svg>
-                </div>
-                <div className="p-4">
-                  <h3 className="font-semibold text-lg text-gray-900 mb-2">
-                    Recipe Title {item}
-                  </h3>
-                  <p className="text-gray-600 text-sm mb-3 line-clamp-2">
-                    A delicious recipe description that will make your mouth water...
-                  </p>
-                  <div className="flex items-center justify-between text-sm text-gray-500">
-                    <span>By Chef Name</span>
-                    <span>⭐ 4.5</span>
-                  </div>
-                </div>
-              </Link>
-            ))}
-          </div>
         </div>
-      </section>
-
-      {/* Categories Section */}
-      <section className="py-16 bg-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <h2 className="text-3xl font-bold text-gray-900 mb-8">Browse by Category</h2>
-          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
-            {[
-              "Appetizers",
-              "Main Courses",
-              "Desserts",
-              "Beverages",
-              "Salads",
-              "Soups",
-              "Breakfast",
-              "Snacks",
-            ].map((category) => (
-              <Link
-                key={category}
-                href={`/categories/${category.toLowerCase()}`}
-                className="bg-orange-50 hover:bg-orange-100 border-2 border-orange-200 rounded-lg p-6 text-center transition-colors"
-              >
-                <div className="text-2xl mb-2">🍽️</div>
-                <h3 className="font-semibold text-gray-900">{category}</h3>
-              </Link>
-            ))}
-          </div>
-        </div>
-      </section>
+      </main>
 
       {/* Footer */}
       <footer className="bg-gray-900 text-gray-300 py-12">
